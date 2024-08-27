@@ -48,8 +48,8 @@ class Temporal_ESN(nymph.NymphESN):
         self.WU_BASE = np.array(self.Wu)
         return
 
-    def set_weights(self, W=None, density=0.1):
-        super().set_weights(W, density)
+    def set_weights(self, W=None):
+        super().set_weights(W)
         self.W_BASE = np.array(self.W)
         return
 
@@ -74,7 +74,7 @@ class Temporal_ESN(nymph.NymphESN):
         return list(map(lambda a, b: "11111" if a==1 else b, wake_states, self.encodings))
 
     def generate_single_subinput(self, encoding, index):
-        binary = np.ones((self.N, 1))
+        binary = np.ones((self.N, self.K))
         Wun = np.ones((self.K, self.size_subreservoirs)) * int(encoding[1])
         indices_Wn = np.asarray(range(self.size_subreservoirs)) +  (self.size_subreservoirs*index)
         indices_K = np.asarray(range(self.K))
@@ -123,8 +123,6 @@ class Temporal_ESN(nymph.NymphESN):
         #fold matrix multiplication over the list of binary edges
         binary_edges = functools.reduce(np.multiply, binary_edges_all)
         self.W = np.multiply(self.W_BASE, binary_edges)
-        s = np.linalg.svd(self.W, compute_uv=False)
-        self.W = self.W / (s[0]/self.svd_dv)
         return
 
     def generate_fs(self, encodings: list) -> None:
